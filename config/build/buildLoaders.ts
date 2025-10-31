@@ -11,9 +11,53 @@ export default function buildLoaders(
     {
       test: /\.s[ac]ss$/i,
       use: [
-        isDev ? 'style-loader' : MiniCssExtractPlugin.loader,
-        'css-loader',
-        'sass-loader',
+        {
+          loader: isDev ? 'style-loader' : MiniCssExtractPlugin.loader,
+        },
+        {
+          loader: 'css-loader',
+          options: {
+            modules: {
+              localIdentName: isDev
+                ? '[path][name]__[local]'
+                : '[hash:base64:5]',
+            },
+          },
+        },
+        {
+          loader: 'sass-loader',
+        },
+      ],
+    },
+    {
+      test: /\.(png|jpe?g|)$/i,
+      type: 'asset',
+      parser: {
+        dataUrlCondition: {
+          maxSize: 8 * 1024,
+        },
+      },
+      generator: {
+        filename: 'images/[name][hash][ext][query]',
+      },
+    },
+    {
+      test: /\.svg$/i,
+      oneOf: [
+        // SVG как React-компонент
+        {
+          issuer: /\.[jt]sx?$/,
+          resourceQuery: { not: [/url/] },
+          use: [{ loader: '@svgr/webpack', options: { icon: true } }],
+        },
+        // SVG как обычный файл (URL)
+        {
+          type: 'asset/resource',
+          resourceQuery: /url/,
+          generator: {
+            filename: 'images/[name][hash][ext][query]',
+          },
+        },
       ],
     },
     {
