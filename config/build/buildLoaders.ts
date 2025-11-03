@@ -65,9 +65,12 @@ export default function buildLoaders(
       use: [isDev ? 'style-loader' : MiniCssExtractPlugin.loader, 'css-loader'],
     },
     {
-      test: /\.tsx?$/,
-      use: 'ts-loader',
+      loader: 'ts-loader',
       exclude: /node_modules/,
+      test: /\.tsx?$/,
+      options: {
+        transpileOnly: true,
+      },
     },
   ];
 }
